@@ -23,13 +23,14 @@ public class MainActivity extends AppCompatActivity implements XListView.IXListV
     int page = 1;
     List<Jiexi.NewslistBean> newslist;
     ImageLoader instance;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
         instance = ImageLoader.getInstance();
-        new MyAsync().execute(loadUrl,page);
+        new MyAsync().execute(loadUrl, page);
     }
 
     //初始化控件
@@ -42,20 +43,20 @@ public class MainActivity extends AppCompatActivity implements XListView.IXListV
     //下拉刷新
     @Override
     public void onRefresh() {
-        new MyAsync().execute(loadUrl,++page);
+        new MyAsync().execute(loadUrl, 1);
     }
 
     //上拉加载
     @Override
     public void onLoadMore() {
-        new MyAsync().execute(loadUrl,1);
+        new MyAsync().execute(loadUrl, ++page);
     }
-    public void OnLoad(){
+
+    public void OnLoad() {
         xListView.stopLoadMore();
         xListView.stopRefresh();
         xListView.setRefreshTime("刚刚");
     }
-
     //异步加载
     class MyAsync extends AsyncTask {
 
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements XListView.IXListV
             String temp1 = (String) params[0];
             int temp2 = (int) params[1];
             try {
-                URL url = new URL(temp1+temp2);
+                URL url = new URL(temp1 + temp2);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setReadTimeout(5 * 1000);
                 conn.setConnectTimeout(5 * 1000);
@@ -75,15 +76,13 @@ public class MainActivity extends AppCompatActivity implements XListView.IXListV
                     int length = 0;
                     byte[] b = new byte[1024];
                     while ((length = inputStream.read(b)) != -1) {
-                        String string = new String(b,0,length);
+                        String string = new String(b, 0, length);
                         all += string;
                     }
-
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
 
             return all;
         }
@@ -94,13 +93,15 @@ public class MainActivity extends AppCompatActivity implements XListView.IXListV
             String getJson = (String) o;
             Gson gson = new Gson();
             newslist = gson.fromJson(getJson, Jiexi.class).getNewslist();
+
             Myclass myclass = new Myclass();
             xListView.setAdapter(myclass);
 
             OnLoad();
         }
     }
-    class Myclass extends BaseAdapter{
+
+    class Myclass extends BaseAdapter {
 
         @Override
         public int getCount() {
@@ -120,12 +121,12 @@ public class MainActivity extends AppCompatActivity implements XListView.IXListV
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            if(convertView==null){
-                convertView = View.inflate(MainActivity.this,R.layout.item,null);
+            if (convertView == null) {
+                convertView = View.inflate(MainActivity.this, R.layout.item, null);
             }
             ImageView iamge = (ImageView) convertView.findViewById(R.id.image_item);
             TextView text = (TextView) convertView.findViewById(R.id.textview_item);
-            instance.displayImage(newslist.get(position).getPicUrl(),iamge);
+            instance.displayImage(newslist.get(position).getPicUrl(), iamge);
             text.setText(newslist.get(position).getTitle());
             return convertView;
         }
